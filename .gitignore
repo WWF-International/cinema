@@ -1,0 +1,53 @@
+.htaccess
+
+# Don't commit the backups
+# ------------------------
+*.bak*
+
+# Avoid any banhammer
+# -------------------
+fonts/*.*
+
+# Avoiding clashes with SVN
+# -------------------------
+.svn/
+
+
+# General OS X rules
+# ------------------
+._*
+.AppleDouble
+.DS_Store
+.LSOverride
+.Spotlight-V100
+.Trashes
+Icon
+*.dmg
+
+# Windows rules
+# -------------
+*.cab
+*.msi
+*.msm
+*.msp
+$RECYCLE.BIN/
+ehthumbs.db
+Desktop.ini
+Thumbs.db
+
+
+# Packages and archives
+# --------------------
+
+*.7z
+*.bz2
+*.bzip
+*.cab
+*.gz
+*.iso
+*.jar
+*.lzma
+*.rar
+*.tar
+*.xz
+*.zip

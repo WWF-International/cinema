@@ -1,5 +1,9 @@
 .htaccess
 
+# Don't commit any hidden folders
+# -------------------------------
+.tresorit/
+
 # Don't commit the backups
 # ------------------------
 *.bak*

@@ -1,0 +1,22 @@
+.cinema-wrapper {
+	height: 0;
+	padding: 0 0 56.25% 0; /* 16:9 - ((100/16) * 9) */
+	position: absolute;
+	width: 100%;
+
+	.cinema,
+	.cinema-thumbnail,
+	.cinema-overlay {
+		height: 100%;
+		left: 0;
+		position: absolute;
+		top: 0;
+		width: 100%;
+		z-index: -1;
+	}
+
+	.cinema-overlay {
+		background : transparent;
+		z-index: 1;
+	}
+}

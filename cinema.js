@@ -12,13 +12,13 @@ function cinema() {
     }
 
 
-	// Cross browser getElementsByClassName
+	// Cross browser getElementsByClassName - gEBCN to avoid name clashes.
 	// -------------------------------------------------------------------------
 	// First up, native getElementByClassName
     if ( document.getElementsByClassName ) {
     	console.log('getElementsByClassName');
 
-    	function getElementsByClassName(classname) {
+    	function gEBCN(classname) {
     		return document.getElementsByClassName(classname);
     	}
     }
@@ -27,7 +27,7 @@ function cinema() {
     else if ( document.querySelector ) {
     	console.log('querySelector');
 
-    	function getElementsByClassName(classname) {
+    	function gEBCN(classname) {
     		return document.querySelector('.' + classname);
     	}
     }
@@ -36,7 +36,7 @@ function cinema() {
     else {
     	console.log('urgh');
 
-    	function getElementsByClassName(classname) {
+    	function gEBCN(classname) {
 		    var elements = [],
 		        getEverything = document.getElementsByTagName('*'),
 		        classnameRegex = new RegExp('(^|\\s)' + classname + '(\\s|$)');
@@ -54,7 +54,7 @@ function cinema() {
 
 	// All your variables are belong to us
 	// -------------------------------------------------------------------------
-	var screens = getElementsByClassName('cinema'),
+	var screens = gEBCN('cinema'),
 		youtubeParameters = {
 			autoplay : 1,
 			controls : 0,
@@ -71,10 +71,10 @@ function cinema() {
 	    // Setting the source of the youtubeTag <script>
 	    youtubeTag.src = 'https://www.youtube.com/iframe_api';
 
-	// Check for the existance of any .cinema classes - if not, then stop the
-	// script
+	// Check for the existance of any .cinema classes - if not, then stop
+	// cinema.js from going any further.
 	// -------------------------------------------------------------------------
-	if ( screens == 0 || screens === undefined || screens === null ) {
+	if ( screens == 0 || screens === null ) {
 		return false;
 	}
 
@@ -110,7 +110,7 @@ function cinema() {
 	    }
 	}
 
-	function set(event) {
+	function getSet(event) {
 		event.target.setVolume(0);
 	}
 
@@ -127,8 +127,8 @@ function cinema() {
             videoId: youtubeID,
             playerVars : youtubeParameters,
             events: {
-            	'onReady' : set,
-                'onStateChange': go // 	Needs to fade out.
+            	'onReady' : getSet,
+                'onStateChange': go // 	Needs to fade out. And put the thumbnail back at the end of the video?
             }
         });
     }

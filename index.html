@@ -80,7 +80,11 @@
 		<script>
 		//<![CDATA[
 			(function(){
-			     cinema();
+                                function first() {
+                                        document.getElementsByTagName('header')[0].className = 'top-left';
+                                };
+
+                                cinema( first );
 			})();
                 //]]>
 		</script>

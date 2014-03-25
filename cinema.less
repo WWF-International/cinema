@@ -2,6 +2,9 @@
 	height: 0;
 	padding: 0 0 56.25% 0; /* 16:9 - ((100/16) * 9) */
 	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
 	width: 100%;
 
 	.cinema,
@@ -12,7 +15,15 @@
 		position: absolute;
 		top: 0;
 		width: 100%;
-		z-index: -1;
+		z-index: 0;
+	}
+
+	.cinema-thumbnail {
+		opacity: 1;
+			-moz-transition: opacity 250ms ease-out;
+			-o-transition: opacity 250ms ease-out;
+			-webkit-transition: opacity 250ms ease-out;
+		transition: opacity 250ms ease-out;
 	}
 
 	.cinema-overlay {

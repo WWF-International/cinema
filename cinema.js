@@ -1,4 +1,15 @@
-function cinema() {
+function cinema( passedOverOnReady ) {
+
+	// Catch any console.log for older browsers without a debugger.
+	// -------------------------------------------------------------------------
+	if ( typeof console === 'undefined' ) {
+    	console = {
+    		log: function() {
+    		}
+    	};
+
+    	alert('No console');
+	}
 
 	// Check to see if an object is empty
 	// -------------------------------------------------------------------------
@@ -88,12 +99,11 @@ function cinema() {
 	// -------------------------------------------------------------------------
 	for (var i = screens.length - 1; i >= 0; i--) {
 
-		var youtubeID = screens[i].id;
+		var ytID = screens[i].id;
 
 		console.log(screens[i]);
 
-		addedHTML = '<img src="//i1.ytimg.com/vi/' + youtubeID + '/maxresdefault.jpg" id="' + youtubeID + '-thumbnail" class="cinema-thumbnail" />';
-		addedHTML = '<div class="cinema-overlay"></div>' + addedHTML;
+		var addedHTML = createThumbnail(ytID) + '<div class="cinema-overlay"></div>' + addedHTML;
 
 		screens[i].parentElement.innerHTML += addedHTML;
 
@@ -110,13 +120,26 @@ function cinema() {
 	    }
 	}
 
+	function createThumbnail(ytID) {
+		return '<img src="//i1.ytimg.com/vi/' + ytID + '/maxresdefault.jpg" id="' + ytID + '-thumbnail" class="cinema-thumbnail" />'
+	}
+
 	function getSet(event) {
 		event.target.setVolume(0);
+
+		passedOverOnReady();
+
 	}
 
 	function go(event) {
-        var thumbnail = document.getElementById(event.target.a.id + '-thumbnail');
-        thumbnail.parentNode.removeChild(thumbnail);
+	    	var thumbnail = document.getElementById(event.target.a.id + '-thumbnail');
+
+		if ( event.data == 1 ) {
+			thumbnail.style.opacity = 0;
+	    }
+	    else if ( event.data == 0 ) {
+	    	thumbnail.style.opacity = 1;
+	    }
 	}
 
 	function youtubePlayer(youtubeID) {
@@ -128,7 +151,7 @@ function cinema() {
             playerVars : youtubeParameters,
             events: {
             	'onReady' : getSet,
-                'onStateChange': go // 	Needs to fade out. And put the thumbnail back at the end of the video?
+                'onStateChange': go // 	Needs to fade out. And put the thumbnail back at the end of the video.
             }
         });
     }

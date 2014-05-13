@@ -8,7 +8,7 @@ function cinema( passedOverOnReady ) {
     		}
     	};
 
-    	alert('No console');
+    	// alert('No console');
 	}
 
 	// Check to see if an object is empty

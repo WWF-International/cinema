@@ -1,4 +1,4 @@
-function cinema( passedOverOnReady ) {
+function cinema(){
 
 	// Catch any console.log for older browsers without a debugger.
 	// -------------------------------------------------------------------------
@@ -10,6 +10,7 @@ function cinema( passedOverOnReady ) {
 
     	// alert('No console');
 	}
+
 
 	// Check to see if an object is empty
 	// -------------------------------------------------------------------------
@@ -23,11 +24,11 @@ function cinema( passedOverOnReady ) {
     }
 
 
-	// Cross browser getElementsByClassName - gEBCN to avoid name clashes.
+    // Cross browser getElementsByClassName - gEBCN to avoid name clashes.
 	// -------------------------------------------------------------------------
 	// First up, native getElementByClassName
     if ( document.getElementsByClassName ) {
-    	console.log('getElementsByClassName');
+    	//console.log('getElementsByClassName');
 
     	function gEBCN(classname) {
     		return document.getElementsByClassName(classname);
@@ -36,7 +37,7 @@ function cinema( passedOverOnReady ) {
 
 	// Then querySelector
     else if ( document.querySelector ) {
-    	console.log('querySelector');
+    	//console.log('querySelector');
 
     	function gEBCN(classname) {
     		return document.querySelector('.' + classname);
@@ -45,7 +46,7 @@ function cinema( passedOverOnReady ) {
 
 	// Then everything else
     else {
-    	console.log('urgh');
+    	//console.log('urgh');
 
     	function gEBCN(classname) {
 		    var elements = [],
@@ -63,24 +64,25 @@ function cinema( passedOverOnReady ) {
 		}
 	};
 
-	// All your variables are belong to us
+
+	// Setting up static, non-changable variables.
 	// -------------------------------------------------------------------------
-	var screens = gEBCN('cinema'),
-		youtubeParameters = {
+    var youtubeParameters = {
 			autoplay : 1,
 			controls : 0,
             disablekb: 1,
             iv_load_policy: 3,
+            loop: 1,
             // modestbranding: 0,
             rel : 0,
             showinfo: 0,
 			wmode : 'transparent'
-		},
-		youtubeTag = document.createElement('script'),
-        firstScriptTag = document.getElementsByTagName('script')[0];
+		};
 
-	    // Setting the source of the youtubeTag <script>
-	    youtubeTag.src = 'https://www.youtube.com/iframe_api';
+
+	// Gather everything with a class of cinema
+	// -------------------------------------------------------------------------
+	var screens = gEBCN('cinema');
 
 	// Check for the existance of any .cinema classes - if not, then stop
 	// cinema.js from going any further.
@@ -89,75 +91,80 @@ function cinema( passedOverOnReady ) {
 		return false;
 	}
 
-    // Add the YouTube script tag before the first <script> tag
+	// Add in thumbnail image
 	// -------------------------------------------------------------------------
-    firstScriptTag.parentNode.insertBefore(youtubeTag, firstScriptTag);
 
-
-	// Loop through every screen, get the thumbnail of the video from YouTube.
-	// Set that as an image in the cinema element - allows flexible width in IE7
-	// -------------------------------------------------------------------------
 	for (var i = screens.length - 1; i >= 0; i--) {
-
-		var ytID = screens[i].id;
-
-		console.log(screens[i]);
-
-		var addedHTML = createThumbnail(ytID) + '<div class="cinema-overlay"></div>' + addedHTML;
-
-		screens[i].parentElement.innerHTML += addedHTML;
-
+		screens[i].innerHTML = createInnards(screens[i].id);
 	};
 
-
-	// We don't want to start loading the iframe or the video until the page has
-	// fully loaded. This function will be triggered once the page has loaded.
+	// Set up the YouTube JS script - place after check to avoid needless
+	// downloads.
 	// -------------------------------------------------------------------------
-	function iframePlease() {
+	var tag = document.createElement('script');
+	tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+
+	// Set up the containers (thumbnail, overlay, div to be replaced with
+	// iframe)
+	// -------------------------------------------------------------------------
+    function createInnards(ytID) {
+			//console.log('createInnards');
+		var overlay = '<div id="' + ytID + '-overlay" class="cinema-overlay"></div>',
+			iframe = '<div id="' + ytID + '-iframe" class="cinema-iframe"></div>',
+			thumbnail = '<img src="//i1.ytimg.com/vi/' + ytID + '/maxresdefault.jpg" id="' + ytID + '-thumbnail" class="cinema-thumbnail" />'
+		return overlay + thumbnail + iframe;
+    };
+
+
+	// This function is fired after the YouTube JavaScript/iFrame API has
+	// downloaded.
+	// -------------------------------------------------------------------------
+	var player;
+	window.onYouTubeIframeAPIReady = function() {
+
+
 		for (var i = screens.length - 1; i >= 0; i--) {
-			console.log('iframePlease');
-			youtubePlayer(screens[i].id);
-	    }
+			var ytID = screens[i].id;
+			screens[i].innerHTML = createInnards(ytID); // making doubly sure that the elements are there
+			var target = document.getElementById(ytID + '-iframe');
+
+			youtubeParameters['playlist'] = ytID;
+
+			// console.log(youtubeParameters);
+
+			function onPlayerReady(event) {
+			};
+			function onPlayerStateChange(event) {
+
+				var iframeId = event.target.a.id,
+					thumbnailId = iframeId.match( ('(\^\.\*)(\?\:-iframe\$)') )[1],
+					thumbnail = document.getElementById(thumbnailId + '-thumbnail');
+
+				if ( event.data == 1 ) {
+					thumbnail.style.opacity = 0;
+					thumbnail.style.display = 'none';
+				}
+				else if ( event.data == 0 ) {
+					thumbnail.style.display = 'block';
+					thumbnail.style.opacity = 1;
+				}
+
+			}
+
+			player = new YT.Player(target, {
+				'autoplay' : 0,
+				videoId: ytID,
+				playerVars : youtubeParameters,
+				events: {
+					'onReady': onPlayerReady,
+					'onStateChange': onPlayerStateChange
+				}
+			});
+		};
+
 	}
 
-	function createThumbnail(ytID) {
-		return '<img src="//i1.ytimg.com/vi/' + ytID + '/maxresdefault.jpg" id="' + ytID + '-thumbnail" class="cinema-thumbnail" />'
-	}
-
-	function getSet(event) {
-		event.target.setVolume(0);
-
-		passedOverOnReady();
-
-	}
-
-	function go(event) {
-	    	var thumbnail = document.getElementById(event.target.a.id + '-thumbnail');
-
-		if ( event.data == 1 ) {
-			thumbnail.style.opacity = 0;
-	    }
-	    else if ( event.data == 0 ) {
-	    	thumbnail.style.opacity = 1;
-	    }
-	}
-
-	function youtubePlayer(youtubeID) {
-        // console.log('youtubePlayer');
-
-        player = new YT.Player(youtubeID, {
-        	'autoplay' : 0,
-            videoId: youtubeID,
-            playerVars : youtubeParameters,
-            events: {
-            	'onReady' : getSet,
-                'onStateChange': go // 	Needs to fade out. And put the thumbnail back at the end of the video.
-            }
-        });
-    }
-
-	window.onload = iframePlease;
-
-	return true;
-
-}
+};

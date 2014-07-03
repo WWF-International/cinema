@@ -60,6 +60,8 @@
                 		margin: auto;
                 		max-width: 480px;
                 		padding: 0.1em 1em;
+                                position: relative;
+                                z-index: 10000;
                 	}
                 </style>
 	</head>
@@ -68,23 +70,17 @@
 			<h1>Cinema</h1>
 		</header>
 
-		<div class="cinema-wrapper">
-			<div class="cinema" id="ja88JM3cfmQ"></div>
-		</div>
+		<div class="cinema" id="ja88JM3cfmQ"></div>
 
 		<section>
-			<p>Cinema lets you to use YouTube videos as backgrounds. It's as easy as adding a <code>script</code> and a <code>div</code>.</p>
+			<p>Cinema lets you to use YouTube videos as backgrounds. It's as easy as adding a <code>script</code> and a single <code>div</code>.</p>
 		</section>
 
 		<script src="cinema.js"></script>
 		<script>
 		//<![CDATA[
 			(function(){
-                                function first() {
-                                        document.getElementsByTagName('header')[0].className = 'top-left';
-                                };
-
-                                cinema( first );
+                                cinema();
 			})();
                 //]]>
 		</script>

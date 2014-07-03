@@ -28,7 +28,7 @@ function cinema(){
 	// -------------------------------------------------------------------------
 	// First up, native getElementByClassName
     if ( document.getElementsByClassName ) {
-    	//console.log('getElementsByClassName');
+    	console.log('getElementsByClassName');
 
     	function gEBCN(classname) {
     		return document.getElementsByClassName(classname);
@@ -37,7 +37,7 @@ function cinema(){
 
 	// Then querySelector
     else if ( document.querySelector ) {
-    	//console.log('querySelector');
+    	console.log('querySelector');
 
     	function gEBCN(classname) {
     		return document.querySelector('.' + classname);
@@ -46,7 +46,7 @@ function cinema(){
 
 	// Then everything else
     else {
-    	//console.log('urgh');
+    	console.log('urgh');
 
     	function gEBCN(classname) {
 		    var elements = [],
@@ -70,13 +70,13 @@ function cinema(){
     var youtubeParameters = {
 			autoplay : 1,
 			controls : 0,
-            disablekb: 1,
+            disablekb: 1, // disable keyboard controls
             iv_load_policy: 3,
             loop: 1,
             // modestbranding: 0,
-            rel : 0,
+            rel : 0, // related videos at the end of the video
             showinfo: 0,
-			wmode : 'transparent'
+			wmode : 'transparent' // forces z-index
 		};
 
 
@@ -89,14 +89,38 @@ function cinema(){
 	// -------------------------------------------------------------------------
 	if ( screens == 0 || screens === null ) {
 		return false;
-	}
-
-	// Add in thumbnail image
-	// -------------------------------------------------------------------------
-
-	for (var i = screens.length - 1; i >= 0; i--) {
-		screens[i].innerHTML = createInnards(screens[i].id);
 	};
+
+	// Check for the presence of modernizr; then detect for touch. If viewed on
+	// a touchscreen, the video won't automatically play.
+	// -------------------------------------------------------------------------
+	if ( typeof Modernizr !== 'undefined' ) {
+		console.log('modernizr present');
+
+		if ( Modernizr.touch ) {
+			wndw = {
+				width : window.screen.width,
+				height : window.screen.height
+			}
+
+			if ( wndw.width < 1025 && wndw.height < 768 ) {
+				console.log('touch is true; screen is small');
+				return false;
+			};
+		};
+
+	}
+	else {
+
+		// Add in thumbnail image
+		// ---------------------------------------------------------------------
+		for (var i = screens.length - 1; i >= 0; i--) {
+			screens[i].innerHTML = createInnards(screens[i].id);
+		};
+	};
+
+	console.log('screen width - ' + window.screen.width);
+
 
 	// Set up the YouTube JS script - place after check to avoid needless
 	// downloads.
@@ -111,10 +135,10 @@ function cinema(){
 	// iframe)
 	// -------------------------------------------------------------------------
     function createInnards(ytID) {
-			//console.log('createInnards');
+			console.log('createInnards');
 		var overlay = '<div id="' + ytID + '-overlay" class="cinema-overlay"></div>',
 			iframe = '<div id="' + ytID + '-iframe" class="cinema-iframe"></div>',
-			thumbnail = '<img src="//i1.ytimg.com/vi/' + ytID + '/maxresdefault.jpg" id="' + ytID + '-thumbnail" class="cinema-thumbnail" />'
+			thumbnail = '<img src="//i1.ytimg.com/vi/' + ytID + '/mqdefault.jpg" id="' + ytID + '-thumbnail" class="cinema-thumbnail" />'
 		return overlay + thumbnail + iframe;
     };
 
@@ -133,9 +157,10 @@ function cinema(){
 
 			youtubeParameters['playlist'] = ytID;
 
-			// console.log(youtubeParameters);
+			console.log('YouTube Parameters: ' + youtubeParameters);
 
 			function onPlayerReady(event) {
+				player.mute()
 			};
 			function onPlayerStateChange(event) {
 
@@ -145,14 +170,14 @@ function cinema(){
 
 				if ( event.data == 1 ) {
 					thumbnail.style.opacity = 0;
-					thumbnail.style.display = 'none';
+					//thumbnail.style.display = 'none';
 				}
 				else if ( event.data == 0 ) {
 					thumbnail.style.display = 'block';
-					thumbnail.style.opacity = 1;
-				}
+					//thumbnail.style.opacity = 1;
+				};
 
-			}
+			};
 
 			player = new YT.Player(target, {
 				'autoplay' : 0,
